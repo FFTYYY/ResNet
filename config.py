@@ -39,11 +39,14 @@ _par.add_argument("--step_size" 	, type = int , default = 1)
 _par.add_argument("--valid_data" 	, type = str , default = "test")
 
 
+#solely test
+_par.add_argument("--model_load" 	, type = str , default = "")
+	#example : best_DataParallel_acc_2019-10-24-01-09-53
+
 #others
 _par.add_argument("--model_save" 	, type = str , default = "trained_models/")
 _par.add_argument("--seed" 			, type = int , default = 2333)
 _par.add_argument("--log_file" 		, type = str , default = "log.txt")
-
 
 #---------------------------------------------------------------------------------------------------
 
@@ -53,6 +56,12 @@ C.data_load = os.path.join(C.data_load , C.data)
 
 C.gpus = [int(x) for x in filter(lambda x:x , C.gpus.strip().split(","))]
 
+C.test_mode = False
+if C.model_load:
+	C.test_mode = True
+
+if C.test_mode:
+	C.log_file += ".test"
 
 logger = Logger(C.log_file)
 logger.log = logger.log_print_w_time

@@ -15,24 +15,24 @@ import random
 
 
 transform_ori = transforms.Compose([
-	transforms.ToTensor(),
-	transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+	transforms.ToTensor() ,
+	transforms.Normalize((0.5 , 0.5 , 0.5), (0.5 , 0.5 , 0.5)) ,
 ])
 
 transform_train_aug1 = transforms.Compose([
-	transforms.RandomHorizontalFlip(),
-	transforms.RandomGrayscale(),
-	transforms.ToTensor(),
-	transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+	transforms.RandomHorizontalFlip() ,
+	transforms.RandomGrayscale() ,
+	transforms.ToTensor() ,
+	transforms.Normalize((0.5 , 0.5 , 0.5), (0.5 , 0.5 , 0.5)) , 
 ])
 
 transform_train_aug2 = transforms.Compose([
-	transforms.Resize(40),
-	transforms.RandomHorizontalFlip(),
-	transforms.RandomCrop(32),
-	transforms.ColorJitter(brightness=0.5, contrast=0.5, hue=0.5),
-	transforms.ToTensor(),
-	transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+	transforms.Resize(40) ,
+	transforms.RandomHorizontalFlip() ,
+	transforms.RandomCrop(32) ,
+	transforms.ColorJitter(brightness = 0.5 , contrast = 0.5 , hue = 0.5) ,
+	transforms.ToTensor() ,
+	transforms.Normalize([0.5 , 0.5 , 0.5], [0.5 , 0.5 , 0.5]) , 
 ])
 
 
