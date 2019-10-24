@@ -42,6 +42,7 @@ _par.add_argument("--valid_data" 	, type = str , default = "test")
 #solely test
 _par.add_argument("--model_load" 	, type = str , default = "")
 	#example : best_DataParallel_acc_2019-10-24-01-09-53
+_par.add_argument("--n_crop" 		, type = int , default = 0)
 
 #others
 _par.add_argument("--model_save" 	, type = str , default = "trained_models/")

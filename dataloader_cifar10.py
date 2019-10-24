@@ -36,6 +36,38 @@ transform_train_aug2 = transforms.Compose([
 ])
 
 
+
+def n_crop_test(dataset_location , n_crop = 1):
+	os.makedirs(dataset_location , exist_ok = True)
+
+	if n_crop <= 0:
+		trs = [transform_ori]
+	else:
+		trs = [
+			transforms.Compose([
+				transforms.Resize(34) ,
+				transforms.RandomCrop(32) ,
+				transforms.ToTensor() ,
+				transforms.Normalize((0.5 , 0.5 , 0.5), (0.5 , 0.5 , 0.5)) ,
+			])
+			for _ in range(n_crop)
+		]
+	testsets = [
+		list(torchvision.datasets.CIFAR10(
+			root = dataset_location , 
+			train = False, 
+			download = True , 
+			transform = tr
+		) )
+		for tr in trs
+	]
+
+	#testset[i] : [ [s1, s2 ,...] , lab ]
+	testset = [ [ [tes[i][0] for tes in testsets] , testsets[0][i][1] ] for i in range(len(testsets[0])) ]
+
+
+	return testset
+
 def read_data(dataset_location):
 	
 	os.makedirs(dataset_location , exist_ok = True)

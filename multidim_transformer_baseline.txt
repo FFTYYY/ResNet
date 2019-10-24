@@ -1,0 +1,32 @@
+------------------------------------------------------ | now time: 0s
+{'batch_size': 64,
+ 'd_hid': 1024,
+ 'd_model': 512,
+ 'd_posenc': 512,
+ 'data': 'cifar-10',
+ 'data_load': 'datas/cifar-10',
+ 'data_save': 'processed_datas/',
+ 'drop_p': 0.3,
+ 'force_reprocess': True,
+ 'gpus': [0, 1, 2, 3, 4, 5, 6, 7],
+ 'h': 8,
+ 'init_steps': 0,
+ 'log_file': 'multidim_transformer_baseline.txt',
+ 'lr': 0.001,
+ 'max_k': 4,
+ 'model': 'transformer',
+ 'model_save': 'mdim_transformer',
+ 'n_epochs': 20,
+ 'n_persis': 512,
+ 'num_layers': 24,
+ 'seed': 2333,
+ 'smallize': False,
+ 'step_size': 1,
+ 'valid_data': 'test',
+ 'valid_size': 1000} | now time: 0s
+------------------------------------------------------ | now time: 0s
+Data load done. | now time: 88s
+train size = 149000 , vali size = 1000 test size = 10000 | now time: 88s
+Creat network done. | now time: 89s
+train: {'best_eval': {'AccuracyMetric': {'acc': 0.9101}}, 'best_epoch': 12, 'best_step': 27948, 'seconds': 27081.53} | now time: 27175s
+test: {'AccuracyMetric': {'acc': 0.9101}} | now time: 27440s

@@ -10,10 +10,12 @@ import numpy as np
 import random
 import pickle
 from tqdm import tqdm
+import torchvision.transforms as transforms
+
 
 from config import C , logger
 from model.multi_dim_transformer import Model as MD_Transformer
-from dataloader_cifar10 import load_data as load_data_cifar_10
+from dataloader_cifar10 import n_crop_test as n_crop_test_cifar_10
 from optim import MyAdam
 
 import pdb
@@ -30,18 +32,13 @@ if C.seed > 0:
 #---------------------------------------------------------------------------------------------------
 #Get data
 data_loaders = {
-	"cifar-10" 			: load_data_cifar_10,
+	"cifar-10" 			: n_crop_test_cifar_10,
 }
 
-data = data_loaders[C.data](
-	dataset_location = C.data_load , save_path = C.data_save , save_name = C.data , 
-	force_reprocess = C.force_reprocess , smallize = C.smallize , 
-)
-
-train_data , test_data = data["train"] , data["test"]
+test_data = data_loaders[C.data](dataset_location = C.data_load , n_crop = C.n_crop)
 
 logger.log ("Data load done.")
-logger.log ("train size = %d test size = %d" % (len(data["train"]) , len(data["test"])))
+logger.log ("test size = %d" % (len(test_data)))
 #---------------------------------------------------------------------------------------------------
 #Get model
 
@@ -50,18 +47,24 @@ net = tc.load( os.path.join(C.model_save , C.model , C.model_load) ).cuda( C.gpu
 logger.log ("Load network done.")
 
 #---------------------------------------------------------------------------------------------------
-#Train & Test
+#Test
 
 good_hit = 0
-for data in tqdm(test_data , ncols = 70):
-	s = data["s"]
-	gold = int(data["label"])
+tot_hit = 0
+pbar = tqdm(test_data , ncols = 70)
+for data in pbar:
+	ss , gold = data
 
-	y = net( s.unsqueeze(0).cuda( C.gpus[0] ) )["pred"][0]
+	with tc.no_grad():
+		s = tc.cat( [s.unsqueeze(0) for s in ss] , dim = 0)
+		y = net( s.cuda( C.gpus[0] ) )["pred"]
+		y = tc.softmax(y , dim = -1).mean(dim = 0)
 
 	y = int(tc.max(y , -1)[1])
 	if y == gold:
 		good_hit += 1
-print ("Test Accurancy : %d/%d = %.2f%%" % (good_hit , len(test_data) , 100 * good_hit / len(test_data)))
+	tot_hit += 1
+	pbar.set_postfix_str("Test Accurancy : %d/%d = %.2f%%" % (good_hit , tot_hit , 100 * good_hit / tot_hit))
+logger.log ("Test Accurancy : %d/%d = %.2f%%" % (good_hit , len(test_data) , 100 * good_hit / len(test_data)))
 
 #---------------------------------------------------------------------------------------------------
