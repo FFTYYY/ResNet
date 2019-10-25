@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 
-class MyAdam:
+class MyAdam(optim.Optimizer):
 	def __init__(self, params , d_model, n_warmup_steps , init_steps  , step_size):
 		self.init_lr = np.power(d_model, -0.5)
 		self._optimizer = optim.Adam(params = params , lr = self.init_lr , betas = (0.9,0.98))
@@ -34,7 +34,7 @@ class MyAdam:
 		for param_group in self._optimizer.param_groups:
 			param_group['lr'] = lr
 
-class MySGD:
+class MySGD(optim.Optimizer):
 	def __init__(self, params , lr):
 		self._optimizer = optim.SGD(params = params , lr = lr , momentum = 0.9 , weight_decay = 0.0001)
 		self.now_step = 0

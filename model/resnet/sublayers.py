@@ -20,19 +20,19 @@ class ResNetLayer_1(nn.Module):
 				kernel_size = 3 , padding = 1 , stride = 2 if sub_sampling else 1)
 		self.bn2 = nn.BatchNorm2d(n_out_channels)
 
-		self.ln = None
+		self.proj = None
 		if n_in_channels != n_out_channels:
-			self.ln = nn.Linear(n_in_channels , n_out_channels)
+			self.proj = nn.Conv2d(n_in_channels , n_out_channels , 
+				kernel_size = 1 , padding = 0 , stride = 2 if sub_sampling else 1)
 
 	def forward(self , x):
 		old_x = x
 		x = F.relu(self.bn1(self.conv1(x)))
 		x = self.bn2(self.conv2(x))
 
-		if self.ln is not None:
-			s = list(x.size())
-			old_x = old_x[:s[0] , :s[1] , :s[2] , :s[3]]
-			old_x = self.ln(old_x.permute(0,2,3,1)).permute(0,3,1,2)
+		if self.proj is not None:
+			old_x = self.proj(old_x)
 
 		x = F.relu(x + old_x)
+
 		return x
