@@ -14,7 +14,7 @@ from config import C , logger
 from model.multi_dim_transformer import Model as MD_Transformer
 from model.resnet import Model as ResNet
 from dataloader_cifar10 import load_data as load_data_cifar_10
-from optim import MyAdam
+from optim import MyAdam , MySGD
 
 import pdb
 
@@ -65,7 +65,9 @@ logger.log ("Creat network done.")
 #Train & Test
 
 optims = {
-	"myadam" : lambda : MyAdam(d_model = C.d_model , n_warmup_steps = 4000 , init_steps = C.init_steps , step_size = C.step_size) ,
+	"myadam" : lambda : MyAdam(params = net.parameters() , d_model = C.d_model , 
+					n_warmup_steps = 4000 , init_steps = C.init_steps , step_size = C.step_size) ,
+	"mysgd"  : lambda : MySGD (params = net.parameters() , lr = C.lr) , 
 	"adam" 	 : lambda : tc.optim.Adam(params = net.parameters() , lr = C.lr) , 
 	"sgd" 	 : lambda : tc.optim.SGD (params = net.parameters() , lr = C.lr) , 
 }

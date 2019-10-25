@@ -43,7 +43,7 @@ _par.add_argument("--valid_size" 	, type = int , default = 1000)
 _par.add_argument("--init_steps" 	, type = int , default = 0)
 _par.add_argument("--step_size" 	, type = int , default = 1)
 _par.add_argument("--valid_data" 	, type = str , default = "test")
-_par.add_argument("--optim" 		, type = str , default = "myadam" , choices = ["myadam" , "adam" , "sgd"])
+_par.add_argument("--optim" 		, type = str , default = "myadam" , choices = ["myadam" , "adam" , "sgd" , "mysgd"])
 
 
 #solely test
