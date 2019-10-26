@@ -38,6 +38,7 @@ class MySGD(optim.Optimizer):
 	def __init__(self, params , lr):
 		self._optimizer = optim.SGD(params = params , lr = lr , momentum = 0.9 , weight_decay = 0.0001)
 		self.now_step = 0
+		self.now_lr = lr
 		self.barriers = [32000 , 48000]
 
 	def step(self):
@@ -51,6 +52,7 @@ class MySGD(optim.Optimizer):
 
 		self.now_step += 1
 		if self.now_step in self.barriers:
+			self.now_lr *= 0.1
 			for param_group in self._optimizer.param_groups:
-				param_group['lr'] /= 10.
+				param_group['lr'] = self.now_lr
 

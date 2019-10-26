@@ -92,7 +92,7 @@ trainer = Trainer(
 train_result = trainer.train(load_best_model = True)
 logger.log("train: {0}".format(train_result))
 
-print ("Train done. Now testing.")
+print ("Training done. Now testing.")
 tester = Tester(
 	data 	= test_data , 
 	model 	= net , 

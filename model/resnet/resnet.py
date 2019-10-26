@@ -8,7 +8,7 @@ from .sublayers import ResNetLayer_1 as Layer
 
 class Model(nn.Module):
 	def __init__(self, num_class , input_size = [32,32] , 
-		n = 9 , fmap_size = [32,16,8] , filter_num = [16,32,64]):
+		n = 9 , fmap_size = [32,16,8] , filter_num = [16,32,64] , drop_p = 0.0):
 
 		super().__init__()
 
@@ -16,6 +16,7 @@ class Model(nn.Module):
 
 		self.in_conv = nn.Conv2d(3 , filter_num[0] , kernel_size = 3 , padding = 1)
 		self.in_bn = nn.BatchNorm2d(filter_num[0])
+		self.drop_1 = nn.Dropout(drop_p)
 
 		imm_layers = []
 
@@ -25,7 +26,7 @@ class Model(nn.Module):
 				d_in  = filter_num[i]
 				d_out = filter_num[i+1] if filter_size_changing else filter_num[i]
 
-				imm_layers.append( Layer(d_in , d_out , filter_size_changing) )
+				imm_layers.append( Layer(d_in , d_out , filter_size_changing , drop_p = drop_p) )
 
 		self.imm_layers = nn.ModuleList(imm_layers)
 
@@ -33,12 +34,12 @@ class Model(nn.Module):
 
 
 	def choose_kwargs():
-		return ["n" , "fmap_size" , "filter_num"]
+		return ["n" , "fmap_size" , "filter_num" , "drop_p"]
 
 	def forward(self , s):
 
 
-		s = F.relu(self.in_bn(self.in_conv(s)))
+		s = self.drop_1(F.relu(self.in_bn(self.in_conv(s))))
 
 		for layer in self.imm_layers:
 			s = layer(s)

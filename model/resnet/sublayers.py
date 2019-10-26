@@ -6,7 +6,7 @@ import math
 import pdb
 
 class ResNetLayer_1(nn.Module):
-	def __init__(self , n_in_channels , n_out_channels , sub_sampling = False):
+	def __init__(self , n_in_channels , n_out_channels , sub_sampling = False , drop_p = 0.0):
 		'''
 			subsampling : stride = 2 to decrease the feature map
 		'''
@@ -25,6 +25,24 @@ class ResNetLayer_1(nn.Module):
 			self.proj = nn.Conv2d(n_in_channels , n_out_channels , 
 				kernel_size = 1 , padding = 0 , stride = 2 if sub_sampling else 1)
 
+		self.dropout = nn.Dropout(drop_p)
+
+		self.reset_parameters()
+
+	def reset_parameters(self):
+		#nn.init.xavier_normal_(self.conv1.weight.data , gain = 1)
+		#nn.init.xavier_normal_(self.conv2.weight.data , gain = 1)
+		#if self.proj is not None:
+		#	nn.init.xavier_normal_(self.proj.weight.data , gain = 1)
+		for m in self.modules():
+			if isinstance(m, nn.Conv2d):
+				n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+				m.weight.data.normal_(0, math.sqrt(2. / n))
+			elif isinstance(m, nn.BatchNorm2d):
+				m.weight.data.fill_(1)
+				m.bias.data.zero_()
+
+
 	def forward(self , x):
 		old_x = x
 		x = F.relu(self.bn1(self.conv1(x)))
@@ -33,6 +51,6 @@ class ResNetLayer_1(nn.Module):
 		if self.proj is not None:
 			old_x = self.proj(old_x)
 
-		x = F.relu(x + old_x)
+		x = self.dropout(F.relu(x + old_x))
 
 		return x

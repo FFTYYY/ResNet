@@ -16,6 +16,7 @@ _par.add_argument("--smallize" 			, action = "store_true", default = False)
 
 #model universal
 _par.add_argument("--model" 		, type = str , default = "transformer" , choices = ["transformer" , "resnet"])
+_par.add_argument("--drop_p" 		, type = float , default = 0.3)
 
 #model transformer
 _par.add_argument("--d_model" 		, type = int , default = 512)
@@ -24,7 +25,6 @@ _par.add_argument("--d_posenc" 		, type = int , default = 512)
 _par.add_argument("--num_layers" 	, type = int , default = 24)
 _par.add_argument("--h" 			, type = int , default = 8)
 _par.add_argument("--n_persis" 		, type = int , default = 512)
-_par.add_argument("--drop_p" 		, type = float , default = 0.3)
 _par.add_argument("--max_k" 		, type = float , default = 4)
 
 #model resnet
