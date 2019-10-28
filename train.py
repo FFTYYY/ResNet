@@ -10,9 +10,10 @@ import numpy as np
 import random
 import pickle
 
-from config import C , logger
 from model.multi_dim_transformer import Model as MD_Transformer
 from model.resnet import Model as ResNet
+from model.third_party import ResNet_56_3p
+from config import C , logger
 from dataloader_cifar10 import load_data as load_data_cifar_10
 from optim import MyAdam , MySGD
 
@@ -53,6 +54,7 @@ logger.log ("train size = %d , vali size = %d test size = %d" % (len(data["train
 models = {
 	"transformer" 	: MD_Transformer,
 	"resnet" 		: ResNet,
+	"3p-resnet" 	: ResNet_56_3p,
 }
 model = models[C.model]
 net = model(num_class = 10 , input_size = [32,32] ,

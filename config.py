@@ -2,6 +2,7 @@ import argparse
 import os
 from utils.logger import Logger
 from pprint import pformat
+from fastNLP.core._logger import logger as inner_logger
 
 _par = argparse.ArgumentParser()
 
@@ -15,7 +16,7 @@ _par.add_argument("--force_reprocess" 	, action = "store_true", default = False)
 _par.add_argument("--smallize" 			, action = "store_true", default = False)
 
 #model universal
-_par.add_argument("--model" 		, type = str , default = "transformer" , choices = ["transformer" , "resnet"])
+_par.add_argument("--model" 		, type = str , default = "transformer" , choices = ["transformer" , "resnet" , "3p-resnet"])
 _par.add_argument("--drop_p" 		, type = float , default = 0.3)
 
 #model transformer
@@ -76,7 +77,7 @@ if C.model_load:
 if C.test_mode:
 	C.log_file += ".test"
 
-logger = Logger(C.log_file)
+logger = Logger(inner_logger , C.log_file)
 logger.log = logger.log_print_w_time
 
 logger.log ("------------------------------------------------------")
