@@ -14,25 +14,18 @@ import pickle
 import random
 
 
+normalize = transforms.Normalize(mean = [0.491 , 0.482 , 0.447] , std = [0.247 , 0.243 , 0.262])
+
+transform_train = transforms.Compose([
+	transforms.RandomCrop(32, padding = 4),
+	transforms.RandomHorizontalFlip(),
+	transforms.ToTensor(),
+	normalize,
+])
+
 transform_ori = transforms.Compose([
-	transforms.ToTensor() ,
-	transforms.Normalize((0.5 , 0.5 , 0.5), (0.5 , 0.5 , 0.5)) ,
-])
-
-transform_train_aug1 = transforms.Compose([
-	transforms.RandomHorizontalFlip() ,
-	transforms.RandomGrayscale() ,
-	transforms.ToTensor() ,
-	transforms.Normalize((0.5 , 0.5 , 0.5), (0.5 , 0.5 , 0.5)) , 
-])
-
-transform_train_aug2 = transforms.Compose([
-	transforms.Resize(40) ,
-	transforms.RandomHorizontalFlip() ,
-	transforms.RandomCrop(32) ,
-	transforms.ColorJitter(brightness = 0.5 , contrast = 0.5 , hue = 0.5) ,
-	transforms.ToTensor() ,
-	transforms.Normalize([0.5 , 0.5 , 0.5], [0.5 , 0.5 , 0.5]) , 
+	transforms.ToTensor(),
+	normalize,
 ])
 
 
@@ -45,10 +38,10 @@ def n_crop_test(dataset_location , n_crop = 1):
 	else:
 		trs = [
 			transforms.Compose([
-				transforms.Resize(34) ,
-				transforms.RandomCrop(32) ,
-				transforms.ToTensor() ,
-				transforms.Normalize((0.5 , 0.5 , 0.5), (0.5 , 0.5 , 0.5)) ,
+				transforms.RandomCrop(32, padding = 4),
+				transforms.RandomHorizontalFlip(),
+				transforms.ToTensor(),
+				normalize,
 			])
 			for _ in range(n_crop)
 		]
@@ -72,12 +65,10 @@ def read_data(dataset_location):
 	
 	os.makedirs(dataset_location , exist_ok = True)
 
-	trainset_1 	= torchvision.datasets.CIFAR10(root = dataset_location , train = True , download = True , transform = transform_ori)
-	trainset_2 	= torchvision.datasets.CIFAR10(root = dataset_location , train = True , download = True , transform = transform_train_aug1)
-	trainset_3 	= torchvision.datasets.CIFAR10(root = dataset_location , train = True , download = True , transform = transform_train_aug2)
+	trainset 	= torchvision.datasets.CIFAR10(root = dataset_location , train = True , download = True , transform = transform_train)
 	testset  	= torchvision.datasets.CIFAR10(root = dataset_location , train = False, download = True , transform = transform_ori)
 
-	train_data = list(trainset_1) + list(trainset_2) + list(trainset_3)
+	train_data = list(trainset)
 	test_data = list(testset)
 
 	return [train_data , test_data]

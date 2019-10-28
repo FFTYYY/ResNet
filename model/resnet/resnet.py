@@ -7,7 +7,7 @@ import pdb
 from .sublayers import ResNetLayer_1 as Layer
 
 class Model(nn.Module):
-	def __init__(self, num_class , input_size = [32,32] , 
+	def __init__(self, num_class = 10, input_size = [32,32] , 
 		n = 9 , fmap_size = [32,16,8] , filter_num = [16,32,64] , drop_p = 0.0):
 
 		super().__init__()

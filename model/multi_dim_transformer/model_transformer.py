@@ -12,7 +12,7 @@ from .transformer_sublayers import *
 Position_Embedding = PE_1
 
 class Model(nn.Module):
-	def __init__(self, num_class , input_size = [32,32] ,num_layers = 4 , 
+	def __init__(self, num_class = 10, input_size = [32,32] ,num_layers = 4 , 
 			d_model = 512 , d_hid = 512 , d_posenc = 512 , n_persis = 512 , 
 			h = 8 , drop_p = 0.0 , max_k = 4):
 		super().__init__()
