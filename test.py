@@ -13,10 +13,11 @@ from tqdm import tqdm
 import torchvision.transforms as transforms
 
 
-from config import C , logger
 from model.multi_dim_transformer import Model as MD_Transformer
+from model.resnet import Model as ResNet
+from model.third_party import ResNet_56_3p
+from config import C , logger
 from dataloader_cifar10 import n_crop_test as n_crop_test_cifar_10
-from optim import MyAdam
 
 import pdb
 
@@ -45,10 +46,29 @@ logger.log ("test size = %d" % (len(test_data)))
 net = tc.load( os.path.join(C.model_save , C.model , C.model_load) ).cuda( C.gpus[0] )
 
 logger.log ("Load network done.")
+#---------------------------------------------------------------------------------------------------
+#fastNLP Test
+
+if C.n_crop <= 1:
+	fastNLP_data = DataSet()
+	for s  , lab in test_data:
+		fastNLP_data.append ( Instance (s = s[0] , label = lab) )
+	fastNLP_data.set_input("s")
+	fastNLP_data.set_target("label")
+
+	tester = Tester(
+		data 	= fastNLP_data , 
+		model 	= net , 
+		metrics = AccuracyMetric(pred = "pred" , target = "label") ,
+		device 	= C.gpus , 
+	)
+	test_result = tester.test()
+	logger.log("fastNLP test: {0}".format(test_result))
+
 
 #---------------------------------------------------------------------------------------------------
 #Test
-
+net = net.eval()
 good_hit = 0
 tot_hit = 0
 pbar = tqdm(test_data , ncols = 70)

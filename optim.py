@@ -4,6 +4,7 @@ import torch as tc
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+from config import logger
 
 class MyAdam(optim.Optimizer):
 	def __init__(self, params , d_model, n_warmup_steps , init_steps  , step_size):
@@ -53,6 +54,7 @@ class MySGD(optim.Optimizer):
 		self.now_step += 1
 		if self.now_step in self.barriers:
 			self.now_lr *= 0.1
+			logger.log("now lr changing.... new lr = %.4f" % (self.now_lr))
 			for param_group in self._optimizer.param_groups:
 				param_group['lr'] = self.now_lr
 

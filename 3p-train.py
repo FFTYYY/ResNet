@@ -27,6 +27,7 @@ parser.add_argument('--print-freq', '-p', default=10, type=int, metavar='N', hel
 parser.add_argument('--resume', default='', type=str, metavar='PATH', help='path to latest checkpoint (default: none)')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true', help='evaluate model on validation set')
 parser.add_argument('-ct', '--cifar-type', default='10', type=int, metavar='CT', help='10 for cifar10,100 for cifar100 (default: 10)')
+parser.add_argument('--resave', action='store_true' , default = False)
 
 best_prec = 0
 
@@ -60,7 +61,7 @@ def main():
         # mkdir a new folder to store the checkpoint and best model
         if not os.path.exists('result'):
             os.makedirs('result')
-        fdir = 'result/resnet20_cifar10'
+        fdir = 'result/resnet'
         if not os.path.exists(fdir):
             os.makedirs(fdir)
 
@@ -84,6 +85,7 @@ def main():
             model.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
             print("=> loaded checkpoint '{}' (epoch {})".format(args.resume, checkpoint['epoch']))
+
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
@@ -143,6 +145,12 @@ def main():
 
     if args.evaluate:
         validate(testloader, model, criterion)
+        return
+
+    if args.resave:
+        prec = validate(testloader, model, criterion)
+        model = model.module.cpu()
+        save_model(model , False , fdir)
         return
 
     for epoch in range(args.start_epoch, args.epochs):
@@ -263,6 +271,10 @@ def validate(val_loader, model, criterion):
     print(' * Prec {top1.avg:.3f}% '.format(top1=top1))
 
     return top1.avg
+
+def save_model(model, is_best, fdir):
+    filepath = os.path.join(fdir, 'checkpoint.model')
+    torch.save(model, filepath)
 
 
 def save_checkpoint(state, is_best, fdir):
