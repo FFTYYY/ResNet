@@ -13,28 +13,18 @@ from fastNLP import DataSet , Instance , Vocabulary
 import pickle
 import random
 
-
-normalize = transforms.Normalize(mean = [0.491 , 0.482 , 0.447] , std = [0.247 , 0.243 , 0.262])
-
-transform_train = transforms.Compose([
-	transforms.RandomCrop(32, padding = 4),
-	transforms.RandomHorizontalFlip(),
-	transforms.ToTensor(),
-	normalize,
-])
-
-transform_ori = transforms.Compose([
-	transforms.ToTensor(),
-	normalize,
-])
-
-
-
 def n_crop_test(dataset_location , n_crop = 1):
 	os.makedirs(dataset_location , exist_ok = True)
 
+	normalize = transforms.Normalize(mean = [0.491 , 0.482 , 0.447] , std = [0.247 , 0.243 , 0.262])
+
 	if n_crop <= 0:
-		trs = [transform_ori]
+		trs = [
+			transforms.Compose([
+				transforms.ToTensor(),
+				normalize,
+			]),
+		]
 	else:
 		trs = [
 			transforms.Compose([
@@ -62,7 +52,19 @@ def n_crop_test(dataset_location , n_crop = 1):
 	return testset
 
 def read_data(dataset_location):
-	
+	normalize = transforms.Normalize(mean = [0.491 , 0.482 , 0.447] , std = [0.247 , 0.243 , 0.262])
+	transform_train = transforms.Compose([
+		transforms.RandomCrop(32, padding = 4),
+		transforms.RandomHorizontalFlip(),
+		transforms.ToTensor(),
+		normalize,
+	])
+
+	transform_ori = transforms.Compose([
+		transforms.ToTensor(),
+		normalize,
+	])
+
 	os.makedirs(dataset_location , exist_ok = True)
 
 	trainset 	= torchvision.datasets.CIFAR10(root = dataset_location , train = True , download = True , transform = transform_train)
