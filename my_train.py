@@ -62,6 +62,7 @@ logger.log ("Creat network done.")
 #Train & Test
 
 def valid(net , valid_data , epoch_num = 0):
+	bs = 100 #bs should be fact of len(test_data)
 	net = net.eval()
 	n_batchs = len(valid_data) // bs
 	tota_hit = 0
@@ -103,6 +104,7 @@ net = net.cuda(C.gpus[0])
 n_epochs = C.n_epochs
 bs = C.batch_size
 n_batchs = len(train_data) // bs
+tot_step = 0
 for epoch_num in range(n_epochs):
 	net = net.train()
 	tota_hit = 0
@@ -132,10 +134,11 @@ for epoch_num in range(n_epochs):
 
 	valid_res = valid(net , data[C.valid_data] , epoch_num = epoch_num)
 
-	logger.log("--------------------------------------------------------------------")
 	logger.log("Epoch %d ended." % (epoch_num + 1))
 	logger.log("Train Acc : %d/%d = %.4f%%" % (good_hit , tota_hit , 100 * good_hit / tota_hit))
 	logger.log("Valid Acc : %d/%d = %.4f%%" % (valid_res[0] , valid_res[1] , 100 * valid_res[0] / valid_res[1]))
+	logger.log("now total step = %d" % (tot_step))
+	logger.log("--------------------------------------------------------------------")
 
 
 
