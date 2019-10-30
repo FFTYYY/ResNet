@@ -1,5 +1,7 @@
 import os , sys
 
+from config import C , logger
+
 import fastNLP
 from fastNLP import Vocabulary , DataSet , Instance , Tester
 from fastNLP import Trainer , AccuracyMetric , CrossEntropyLoss
@@ -13,20 +15,12 @@ import pickle
 from model.multi_dim_transformer import Model as MD_Transformer
 from model.resnet import Model as ResNet
 from model.third_party import ResNet_56_3p
-from config import C , logger
 from dataloader_cifar10 import load_data as load_data_cifar_10
 from optim import MyAdam , MySGD
 
 import pdb
 
-#---------------------------------------------------------------------------------------------------
-#Initialize
 
-if C.seed > 0:
-	random.seed(C.seed)
-	tc.manual_seed(C.seed)
-	np.random.seed(C.seed)
-	tc.cuda.manual_seed_all(C.seed)
 
 #---------------------------------------------------------------------------------------------------
 #Get data

@@ -37,10 +37,10 @@ class MyAdam(optim.Optimizer):
 
 class MySGD(optim.Optimizer):
 	def __init__(self, params , lr):
-		self._optimizer = optim.SGD(params = params , lr = lr , momentum = 0.9 , weight_decay = 0.0001)
+		self._optimizer = optim.SGD(params = params , lr = lr , momentum = 0.9 , weight_decay = 1e-4)
 		self.now_step = 0
 		self.now_lr = lr
-		self.barriers = [32000 , 48000]
+		self.barriers = [30460 , 45960]
 
 	def step(self):
 		self._update_learning_rate()

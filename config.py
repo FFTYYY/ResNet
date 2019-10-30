@@ -3,6 +3,9 @@ import os
 from utils.logger import Logger
 from pprint import pformat
 from fastNLP.core._logger import logger as inner_logger
+import random
+import torch as tc
+import numpy as np
 
 _par = argparse.ArgumentParser()
 
@@ -83,3 +86,13 @@ logger.log = logger.log_print_w_time
 logger.log ("------------------------------------------------------")
 logger.log (pformat(C.__dict__))
 logger.log ("------------------------------------------------------")
+
+
+#Initialize
+
+if C.seed > 0:
+	random.seed(C.seed)
+	tc.manual_seed(C.seed)
+	np.random.seed(C.seed)
+	tc.cuda.manual_seed_all(C.seed)
+	print ("Seed set. %d" % (C.seed))
