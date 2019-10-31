@@ -156,7 +156,7 @@ for epoch_num in range(C.n_epochs):
 		with open(model_save_path , "wb") as fil:
 			pickle.dump(net , fil)
 		net = net.cuda()
-	logger.log("Got new best acc. Model saved.")
+		logger.log("Got new best acc. Model saved.")
 
 	logger.log("--------------------------------------------------------------------")
 
