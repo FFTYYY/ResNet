@@ -94,7 +94,7 @@ logger.log("Training start.")
 logger.log("--------------------------------------------------------------------")
 
 #variables about model saving
-model_save_path = os.path.join(C.model_path , C.model_save),
+model_save_path = os.path.join(C.model_path , C.model_save)
 best_acc = 0.
 best_epoch = 0.
 
