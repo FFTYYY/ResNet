@@ -22,28 +22,20 @@ from dataloader_cifar10 import n_crop_test as n_crop_test_cifar_10
 import pdb
 
 #---------------------------------------------------------------------------------------------------
-#Initialize
-
-if C.seed > 0:
-	random.seed(C.seed)
-	tc.manual_seed(C.seed)
-	np.random.seed(C.seed)
-	tc.cuda.manual_seed_all(C.seed)
-
-#---------------------------------------------------------------------------------------------------
 #Get data
 data_loaders = {
 	"cifar-10" 			: n_crop_test_cifar_10,
 }
 
-test_data = data_loaders[C.data](dataset_location = C.data_load , n_crop = C.n_crop)
+test_data = data_loaders[C.data](dataset_location = C.data_path , n_crop = C.n_crop)
 
 logger.log ("Data load done.")
 logger.log ("test size = %d" % (len(test_data)))
 #---------------------------------------------------------------------------------------------------
 #Get model
 
-net = tc.load( os.path.join(C.model_save , C.model , C.model_load) ).cuda( C.gpus[0] )
+with open(os.path.join(C.model_path , C.model_save) , "rb") as fil:
+	net = pickle.load( fil ).cuda( C.gpus[0] )
 
 logger.log ("Load network done.")
 #---------------------------------------------------------------------------------------------------
