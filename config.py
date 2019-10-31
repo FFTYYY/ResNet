@@ -13,10 +13,8 @@ _par = argparse.ArgumentParser()
 
 #dataloader
 _par.add_argument("--data" 			, type = str , default = "cifar-10" , choices = ["cifar-10"])
-_par.add_argument("--data_load" 	, type = str , default = "datas/")
-_par.add_argument("--data_save" 	, type = str , default = "processed_datas/")
+_par.add_argument("--data_path" 	, type = str , default = "datas/")
 _par.add_argument("--force_reprocess" 	, action = "store_true", default = False)
-_par.add_argument("--smallize" 			, action = "store_true", default = False)
 
 #model universal
 _par.add_argument("--model" 		, type = str , default = "transformer" , choices = ["transformer" , "resnet" , "3p-resnet"])
@@ -36,8 +34,6 @@ _par.add_argument("--n" 			, type = int , default = 3)
 _par.add_argument("--fmap_size" 	, type = str , default = "32,16,8")
 _par.add_argument("--filter_num" 	, type = str , default = "16,32,64")
 
-
-
 #train & test
 _par.add_argument("--batch_size" 	, type = int , default = 64)
 _par.add_argument("--n_epochs" 		, type = int , default = 32)
@@ -51,12 +47,13 @@ _par.add_argument("--optim" 		, type = str , default = "myadam" , choices = ["my
 
 
 #solely test
-_par.add_argument("--model_load" 	, type = str , default = "")
+_par.add_argument("--test_mode" 	, action = "store_true" , default = False)
+_par.add_argument("--model_path" 	, type = str , default = "trained_models/")
+_par.add_argument("--model_save" 	, type = str , default = "trained.pkl")
 	#example : best_DataParallel_acc_2019-10-24-01-09-53
 _par.add_argument("--n_crop" 		, type = int , default = 0)
 
 #others
-_par.add_argument("--model_save" 	, type = str , default = "trained_models/")
 _par.add_argument("--seed" 			, type = int , default = 2333)
 _par.add_argument("--log_file" 		, type = str , default = "log.txt")
 
@@ -64,7 +61,7 @@ _par.add_argument("--log_file" 		, type = str , default = "log.txt")
 
 C = _par.parse_args()
 
-C.data_load = os.path.join(C.data_load , C.data)
+C.data_path = os.path.join(C.data_path , C.data)
 
 def listize(name):
 	C.__dict__[name] = [int(x) for x in filter(lambda x:x , C.__dict__[name].strip().split(","))]
@@ -72,10 +69,6 @@ def listize(name):
 listize("gpus")
 listize("fmap_size")
 listize("filter_num")
-
-C.test_mode = False
-if C.model_load:
-	C.test_mode = True
 
 if C.test_mode:
 	C.log_file += ".test"
@@ -95,4 +88,9 @@ if C.seed > 0:
 	tc.manual_seed(C.seed)
 	np.random.seed(C.seed)
 	tc.cuda.manual_seed_all(C.seed)
+	tc.backends.cudnn.deterministic = True
+	tc.backends.cudnn.benchmark = False
+
 	print ("Seed set. %d" % (C.seed))
+
+tc.cuda.set_device(C.gpus[0])

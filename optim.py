@@ -40,7 +40,7 @@ class MySGD(optim.Optimizer):
 		self._optimizer = optim.SGD(params = params , lr = lr , momentum = 0.9 , weight_decay = 1e-4)
 		self.now_step = 0
 		self.now_lr = lr
-		self.barriers = [30460 , 45960]
+		self.barriers = [32000 , 48000]
 
 	def step(self):
 		self._update_learning_rate()

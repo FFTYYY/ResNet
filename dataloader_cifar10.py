@@ -1,4 +1,4 @@
-import torch
+import torch as tc
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
@@ -51,72 +51,37 @@ def n_crop_test(dataset_location , n_crop = 1):
 
 	return testset
 
-def read_data(dataset_location):
-	normalize = transforms.Normalize(mean = [0.491 , 0.482 , 0.447] , std = [0.247 , 0.243 , 0.262])
-	transform_train = transforms.Compose([
-		transforms.RandomCrop(32, padding = 4),
-		transforms.RandomHorizontalFlip(),
-		transforms.ToTensor(),
-		normalize,
-	])
-
-	transform_ori = transforms.Compose([
-		transforms.ToTensor(),
-		normalize,
-	])
+def load_data(dataset_location = "./datas"):
 
 	os.makedirs(dataset_location , exist_ok = True)
 
-	trainset 	= torchvision.datasets.CIFAR10(root = dataset_location , train = True , download = True , transform = transform_train)
-	testset  	= torchvision.datasets.CIFAR10(root = dataset_location , train = False, download = True , transform = transform_ori)
+	transform_train = transforms.Compose([
+		transforms.RandomCrop(32 , padding = 4),
+		transforms.RandomHorizontalFlip(),
+		transforms.ToTensor(),
+		transforms.Normalize(mean = [0.491 , 0.482 , 0.447] , std = [0.247 , 0.243 , 0.262]),
+	])
 
-	train_data = list(trainset)
-	test_data = list(testset)
+	transform_test  = transforms.Compose([
+		transforms.ToTensor(),
+		transforms.Normalize(mean = [0.491 , 0.482 , 0.447] , std = [0.247 , 0.243 , 0.262]),
+	])
 
-	return [train_data , test_data]
+	train_data = torchvision.datasets.CIFAR10(root = dataset_location , train = True  , 
+			download = True , transform = transform_train)
 
-def load_data(dataset_location = "datas/cifar-10" , save_path = "processed_datas/" , 
-				save_name = "cifar-10" , force_reprocess = False , smallize = False):
-	
-	if smallize:
-		save_name += "-small"
+	test_data  = torchvision.datasets.CIFAR10(root = dataset_location , train = False , 
+			download = True , transform = transform_test)
 
-	os.makedirs(save_path , exist_ok = True)
-	if save_name:
-		save_file = os.path.join(save_path , save_name)
-		if os.path.exists(save_file) and not force_reprocess:
-			with open(save_file , "rb") as fil:
-				dat = pickle.load(fil)
-			return dat
-
-	read_datas = read_data(dataset_location)
-
-	dataset_lis = []
-	for i in range(len(read_datas)):
-		data = read_datas[i]
-		dataset = DataSet()
-		for s  , lab in data:
-			dataset.append ( Instance (s = s , label = lab) )
-		dataset.set_input("s")
-		dataset.set_target("label")
-		if smallize:
-			dataset = dataset[:1000]
-		dataset_lis.append(dataset)
-
-	dat = {
-		"train" : dataset_lis[0],
-		"test" 	: dataset_lis[1],
+	return {
+		"train" : train_data ,
+		"test"  : test_data  ,
 	}
 
-	if save_name:
-		with open(save_file , "wb") as fil:
-			pickle.dump( dat , fil)
-	return dat
 
 if __name__ == "__main__":
 	from config import C
-	dat = load_data(dataset_location = C.data_load , save_path = C.data_save , save_name = C.data , 
-						force_reprocess = C.force_reprocess , smallize = C.smallize)
+	dat = load_data(dataset_location = C.data_path)
 
 
 	pdb.set_trace()

@@ -11,12 +11,16 @@ from torch.optim import Adadelta
 import numpy as np
 import random
 import pickle
+from tqdm import tqdm
+import torchvision
+import torchvision.transforms as transforms
 
 from model.multi_dim_transformer import Model as MD_Transformer
 from model.resnet import Model as ResNet
 from model.third_party import ResNet_56_3p
 from dataloader_cifar10 import load_data as load_data_cifar_10
 from optim import MyAdam , MySGD
+from utils.confirm_tensor import tensor_feature
 
 import pdb
 
@@ -28,20 +32,16 @@ data_loaders = {
 	"cifar-10" 			: load_data_cifar_10,
 }
 
-data = data_loaders[C.data](
-	dataset_location = C.data_load , save_path = C.data_save , save_name = C.data , 
-	force_reprocess = C.force_reprocess , smallize = C.smallize , 
-)
+data = data_loaders[C.data](dataset_location = C.data_path)
 
 train_data , test_data = data["train"] , data["test"]
 
-if C.valid_size > 0:
-	C.valid_size = min(C.valid_size , len(data["train"]) // 10)
-	data["valid"] = data["train"][:C.valid_size]
-	data["train"] = data["train"][C.valid_size:]
+trainloader = tc.utils.data.DataLoader(train_data , batch_size = C.batch_size , shuffle = True , num_workers = 2)
+testloader  = tc.utils.data.DataLoader(test_data  , batch_size = 100 		  , shuffle = False, num_workers = 2)
+#batch_size should be able to be deviced by 10000
 
 logger.log ("Data load done.")
-logger.log ("train size = %d , vali size = %d test size = %d" % (len(data["train"]) , len(data["valid"]) , len(data["test"])))
+
 #---------------------------------------------------------------------------------------------------
 #Get model
 
@@ -58,8 +58,47 @@ net = model(num_class = 10 , input_size = [32,32] ,
 logger.log ("Creat network done.")
 
 #---------------------------------------------------------------------------------------------------
-#Train & Test
+#Valid
 
+def valid(net , valid_data , epoch_num = 0):
+
+	net = net.eval()
+
+	tota_hit = 0
+	good_hit = 0
+
+	pbar = tqdm(testloader , ncols = 70)	
+	pbar.set_description_str("(Epoch %d) Testing " % (epoch_num+1))
+
+	for (xs, goldens) in pbar:
+
+		xs = xs.cuda()
+		goldens = goldens.cuda()
+		ys = net(xs)["pred"]
+
+		got = tc.max(ys , -1)[1]
+		good_hit += int((goldens == got).long().sum())
+		tota_hit += len(goldens)
+		pbar.set_postfix_str("Valid Acc : %d/%d = %.4f%%" % (good_hit , tota_hit , 100 * good_hit / tota_hit))
+
+	return good_hit , tota_hit
+
+#---------------------------------------------------------------------------------------------------
+#Optimizer control
+
+
+
+#---------------------------------------------------------------------------------------------------
+#Train
+logger.log("Training start.")
+logger.log("--------------------------------------------------------------------")
+
+#variables about model saving
+model_save_path = os.path.join(C.model_path , C.model_save),
+best_acc = 0.
+best_epoch = 0.
+
+#optimizer
 optims = {
 	"myadam" : lambda : MyAdam(params = net.parameters() , d_model = C.d_model , 
 					n_warmup_steps = 4000 , init_steps = C.init_steps , step_size = C.step_size) ,
@@ -70,32 +109,55 @@ optims = {
 
 optim = optims[C.optim]()
 
-trainer = Trainer(
-	train_data 	= data["train"] ,
-	dev_data 	= data[C.valid_data] ,
-	model 		= net , 
-	batch_size 	= C.batch_size,
-	loss 		= CrossEntropyLoss(pred = "pred" , target = "label"),
-	metrics 	= AccuracyMetric(pred = "pred" , target = "label"),
-	optimizer 	= optim,
-	n_epochs 	= C.n_epochs,
-	save_path 	= os.path.join(C.model_save , C.model , "./"),
-	device 		= C.gpus , 
-	use_tqdm 	= True,
-	check_code_level = -1,
-)
 
-train_result = trainer.train(load_best_model = True)
-logger.log("train: {0}".format(train_result))
+#loss function
+loss_func = nn.CrossEntropyLoss()
 
-print ("Training done. Now testing.")
-tester = Tester(
-	data 	= test_data , 
-	model 	= net , 
-	metrics = AccuracyMetric(pred = "pred" , target = "label") ,
-	device 	= C.gpus , 
-)
-test_result = tester.test()
-logger.log("test: {0}".format(test_result))
+net = net.cuda()
 
-#---------------------------------------------------------------------------------------------------
+tot_step = 0
+for epoch_num in range(C.n_epochs):
+
+	net = net.train()
+	tota_hit = 0
+	good_hit = 0
+	pbar = tqdm(trainloader , ncols = 70)
+	pbar.set_description_str("(Epoch %d) Training" % (epoch_num+1))
+	for (xs, goldens) in pbar:
+
+		xs = xs.cuda()
+		goldens = goldens.cuda()
+		ys = net(xs)["pred"]
+
+		loss = loss_func(ys , goldens)
+		optim.zero_grad()
+		loss.backward()
+		optim.step()
+
+		got = tc.max(ys , -1)[1]
+		good_hit += int((goldens == got).long().sum())
+		tota_hit += len(goldens)
+		pbar.set_postfix_str("Train Acc : %d/%d = %.4f%%" % (good_hit , tota_hit , 100 * good_hit / tota_hit))
+		tot_step += 1
+
+	valid_res = valid(net , data[C.valid_data] , epoch_num = epoch_num)
+
+	logger.log("Epoch %d ended." % (epoch_num + 1))
+	logger.log("Train Acc : %d/%d = %.4f%%" % (good_hit , tota_hit , 100 * good_hit / tota_hit))
+	logger.log("Valid Acc : %d/%d = %.4f%%" % (valid_res[0] , valid_res[1] , 100 * valid_res[0] / valid_res[1]))
+	logger.log("now total step = %d" % (tot_step))
+
+	valid_acc = valid_res[0] / valid_res[1]
+	if valid_acc > best_acc:
+		best_acc = valid_acc
+		best_epoch = epoch_num
+
+		net = net.cpu()
+		with open(model_save_path , "wb") as fil:
+			pickle.dump(net , fil)
+		net = net.cuda()
+	logger.log("Got new best acc. Model saved.")
+
+	logger.log("--------------------------------------------------------------------")
+
+logger.log("Best Accurancy: %.4f%% in epoch %d" % (best_acc , best_epoch))
