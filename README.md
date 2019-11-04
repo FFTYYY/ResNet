@@ -7,6 +7,8 @@ Mainly reproduction of Resnet ( [Deep Residual Learning for Image Recognition](h
 
 2. For training other models , follow the constructions in train.sh 
 
+###### notice: The parameters after the last epoch is taken to be the final parameters since no remarkable overfitting observed.
+
 ## Testing
 
 1. `python -W ignore test.py --test_mode --model_save=trained.pkl `
@@ -16,4 +18,6 @@ Mainly reproduction of Resnet ( [Deep Residual Learning for Image Recognition](h
 Implementation              | Cifar-10 Acc
 ----------------------------|-----------
 Multi-dim Transformer      	|  91.41%
-ResNet-56                   |  92.79%
+ResNet-56                   |  92.59%
+                            |
+Original ResNet-56          |  93.03%

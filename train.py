@@ -148,7 +148,7 @@ for epoch_num in range(C.n_epochs):
 
 	logger.log("Epoch %d ended." % (epoch_num + 1))
 	logger.log("Train Acc : %d/%d = %.4f%%" % (good_hit , tota_hit , 100 * good_hit / tota_hit))
-	logger.log("Valid Acc : %d/%d = %.4f%%" % (valid_res[0] , valid_res[1] , 100 * valid_res[0] / valid_res[1]))
+	logger.log("Test  Acc : %d/%d = %.4f%%" % (valid_res[0] , valid_res[1] , 100 * valid_res[0] / valid_res[1]))
 	logger.log("now total step = %d" % (tot_step))
 
 	valid_acc = valid_res[0] / valid_res[1]
@@ -156,12 +156,13 @@ for epoch_num in range(C.n_epochs):
 		best_acc = valid_acc
 		best_epoch = epoch_num
 
-		net = net.cpu()
-		with open(model_save_path , "wb") as fil:
-			pickle.dump(net.module , fil)
-		net = net.cuda()
-		logger.log("Got new best acc. Model saved.")
+	net = net.cpu()
+	with open(model_save_path , "wb") as fil:
+		pickle.dump(net.module , fil)
+	net = net.cuda()
+	logger.log("Model saved.")
 
 	logger.log("--------------------------------------------------------------------")
 
-logger.log("Best Accurancy: %.4f%% in epoch %d" % (best_acc , best_epoch))
+logger.log("Best  Accurancy: %.4f%% in epoch %d" % (best_acc  , best_epoch))
+logger.log("Final Accurancy: %.4f%% in epoch %d" % (valid_acc , C.n_epochs))
