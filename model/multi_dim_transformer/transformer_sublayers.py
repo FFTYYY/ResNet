@@ -169,7 +169,7 @@ class Encoder(nn.Module):
 	def __init__(self , num_layers = 4 , d_model = 512 , d_hid = 512 , n_persis = 512 , h = 8 , drop_p = 0.0):
 		super(Encoder, self).__init__()
 
-		self.enc_layer = nn.ModuleList([Encoder_Layer() for _ in range(num_layers)])
+		self.enc_layer = nn.ModuleList([Encoder_Layer(d_model,d_hid,n_persis,h,drop_p) for _ in range(num_layers)])
 
 		self.conv_layer = nn.ModuleList([nn.Conv2d(d_model,d_model,3,padding = 1) for _ in range(num_layers)])
 		self.conv_ln = nn.LayerNorm(d_model)

@@ -17,7 +17,12 @@ _par.add_argument("--data_path" 	, type = str , default = "datas/")
 _par.add_argument("--force_reprocess" 	, action = "store_true", default = False)
 
 #model universal
-_par.add_argument("--model" 		, type = str , default = "transformer" , choices = ["transformer" , "resnet" , "3p-resnet"])
+_par.add_argument("--model" 		, type = str , default = "transformer" , choices = [
+	"transformer" , 
+	"resnet" , 
+	"3p-resnet" , 
+	"att_resnet"
+])
 _par.add_argument("--drop_p" 		, type = float , default = 0.3)
 
 #model transformer

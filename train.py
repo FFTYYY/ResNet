@@ -18,6 +18,8 @@ import torchvision.transforms as transforms
 from model.multi_dim_transformer import Model as MD_Transformer
 from model.resnet import Model as ResNet
 from model.third_party import ResNet_56_3p
+from model.att_resnet import Model as Att_Resnet
+
 from dataloader_cifar10 import load_data as load_data_cifar_10
 from optim import MyAdam , MySGD
 from utils.confirm_tensor import tensor_feature
@@ -37,7 +39,7 @@ data = data_loaders[C.data](dataset_location = C.data_path)
 train_data , test_data = data["train"] , data["test"]
 
 trainloader = tc.utils.data.DataLoader(train_data , batch_size = C.batch_size , shuffle = True , num_workers = 2)
-testloader  = tc.utils.data.DataLoader(test_data  , batch_size = 100 		  , shuffle = False, num_workers = 2)
+testloader  = tc.utils.data.DataLoader(test_data  , batch_size = 20 		  , shuffle = False, num_workers = 2)
 #batch_size should be able to be deviced by 10000
 
 logger.log ("Data load done.")
@@ -49,6 +51,7 @@ models = {
 	"transformer" 	: MD_Transformer,
 	"resnet" 		: ResNet,
 	"3p-resnet" 	: ResNet_56_3p,
+	"att_resnet" 	: Att_Resnet,
 }
 model = models[C.model]
 net = model(num_class = 10 , input_size = [32,32] ,
@@ -113,6 +116,7 @@ optim = optims[C.optim]()
 #loss function
 loss_func = nn.CrossEntropyLoss()
 
+net = nn.DataParallel(net , C.gpus)
 net = net.cuda()
 
 tot_step = 0
@@ -154,7 +158,7 @@ for epoch_num in range(C.n_epochs):
 
 		net = net.cpu()
 		with open(model_save_path , "wb") as fil:
-			pickle.dump(net , fil)
+			pickle.dump(net.module , fil)
 		net = net.cuda()
 		logger.log("Got new best acc. Model saved.")
 
