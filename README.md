@@ -7,11 +7,11 @@ Mainly reproduction of Resnet ( [Deep Residual Learning for Image Recognition](h
 
 2. For training other models , follow the constructions in train.sh 
 
-### Testing
+## Testing
 
 1. `python -W ignore test.py --test_mode --model_save=trained.pkl `
 
-### Result
+## Result
 
 Implementation              | Cifar-10 Acc
 ----------------------------|-----------
