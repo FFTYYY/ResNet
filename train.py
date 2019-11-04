@@ -17,7 +17,6 @@ import torchvision.transforms as transforms
 
 from model.multi_dim_transformer import Model as MD_Transformer
 from model.resnet import Model as ResNet
-from model.third_party import ResNet_56_3p
 from model.att_resnet import Model as Att_Resnet
 
 from dataloader_cifar10 import load_data as load_data_cifar_10
@@ -50,7 +49,6 @@ logger.log ("Data load done.")
 models = {
 	"transformer" 	: MD_Transformer,
 	"resnet" 		: ResNet,
-	"3p-resnet" 	: ResNet_56_3p,
 	"att_resnet" 	: Att_Resnet,
 }
 model = models[C.model]
