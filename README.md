@@ -19,5 +19,4 @@ Implementation              | Cifar-10 Acc
 ----------------------------|-----------
 Multi-dim Transformer      	|  91.41%
 ResNet-56                   |  92.59%
-                            |
 Original ResNet-56          |  93.03%
