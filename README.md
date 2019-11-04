@@ -1,6 +1,6 @@
 Mainly reproduction of Resnet ( [Deep Residual Learning for Image Recognition](https://arxiv.org/pdf/1512.03385.pdf) ), and also some other methods.
 
-### Training
+## Training
 
 1. For training resnet:
 ` python -W ignore train.py --model=resnet --optim=mysgd --n=9 --batch_size=128 --gpus=0--lr=0.1 --n_epochs=200 --drop_p=0.0 --model_save=trained.pkl `
