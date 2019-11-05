@@ -5,7 +5,10 @@ class Logger:
 		self.inner_logger = inner_logger
 		if fil_path:
 			self.inner_logger.add_file(path = fil_path)
-			
+
+	def nolog(self , cont = ""):
+		pass
+
 	def log_print(self , cont = ""):
 		self.inner_logger.info(cont)
 

@@ -6,7 +6,7 @@ import math
 import pdb
 
 class ResNetLayer_1(nn.Module):
-	def __init__(self , n_in_channels , n_out_channels , sub_sampling = False , drop_p = 0.0):
+	def __init__(self , n_in_channels , n_out_channels , sub_sampling = False , drop_p = 0.0 , nores = False):
 		'''
 			subsampling : stride = 2 to decrease the feature map
 		'''
@@ -28,6 +28,8 @@ class ResNetLayer_1(nn.Module):
 		self.dropout = nn.Dropout(drop_p)
 
 		self.reset_parameters()
+
+		self.nores = nores
 
 	def reset_parameters(self):
 		#nn.init.xavier_normal_(self.conv1.weight.data , gain = 1)
@@ -51,6 +53,9 @@ class ResNetLayer_1(nn.Module):
 		if self.proj is not None:
 			old_x = self.proj(old_x)
 
-		x = self.dropout(F.relu(x + old_x))
+		if not self.nores:
+			x = x + old_x
+
+		x = self.dropout(F.relu(x))
 
 		return x

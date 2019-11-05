@@ -37,6 +37,7 @@ _par.add_argument("--max_k" 		, type = float , default = 4)
 _par.add_argument("--n" 			, type = int , default = 3)
 _par.add_argument("--fmap_size" 	, type = str , default = "32,16,8")
 _par.add_argument("--filter_num" 	, type = str , default = "16,32,64")
+_par.add_argument("--nores" 		, action = "store_true" , default = False)
 
 #train & test
 _par.add_argument("--batch_size" 	, type = int , default = 64)
@@ -60,6 +61,8 @@ _par.add_argument("--n_crop" 		, type = int , default = 0)
 #others
 _par.add_argument("--seed" 			, type = int , default = 2333)
 _par.add_argument("--log_file" 		, type = str , default = "log.txt")
+_par.add_argument("--no_log" 		, action = "store_true" , default = False)
+_par.add_argument("--file" 			, type = str , default = "")
 
 #---------------------------------------------------------------------------------------------------
 
@@ -79,6 +82,8 @@ if C.test_mode:
 
 logger = Logger(inner_logger , C.log_file)
 logger.log = logger.log_print_w_time
+if C.no_log:
+	logger.log = logger.nolog
 
 logger.log ("------------------------------------------------------")
 logger.log (pformat(C.__dict__))
@@ -95,6 +100,6 @@ if C.seed > 0:
 	tc.backends.cudnn.deterministic = True
 	tc.backends.cudnn.benchmark = False
 
-	print ("Seed set. %d" % (C.seed))
+	logger.log ("Seed set. %d" % (C.seed))
 
 tc.cuda.set_device(C.gpus[0])
