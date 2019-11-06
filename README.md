@@ -17,7 +17,7 @@ Mainly reproduction of Resnet ( [Deep Residual Learning for Image Recognition](h
 
 Implementation              | Cifar-10 Acc
 ----------------------------|-----------
-Multi-dim Transformer      	|  91.41%
+Multi-dim Transformer       |  91.41%
 ResNet-32                   |  92.38%
 ResNet-56                   |  92.59%
 Original ResNet-32          |  92.49%
